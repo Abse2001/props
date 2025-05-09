@@ -1,4 +1,6 @@
 import { distance } from "circuit-json"
+import { nine_point_anchor } from "lib/common/nine_point_anchor"
+import { five_point_anchor } from "lib/common/five_point_anchor"
 import { z } from "zod"
 
 export const schematicTextProps = z.object({
@@ -6,17 +8,7 @@ export const schematicTextProps = z.object({
   schY: distance,
   text: z.string(),
   anchor: z
-    .enum([
-      "top_left",
-      "top_center",
-      "top_right",
-      "center_left",
-      "center",
-      "center_right",
-      "bottom_left",
-      "bottom_center",
-      "bottom_right",
-    ])
+    .union([five_point_anchor.describe("legacy"), nine_point_anchor])
     .optional(),
   color: z.string().optional(),
 })
