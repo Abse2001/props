@@ -23,25 +23,14 @@ export const schematicBoxProps = z
     titleInside: z.boolean().default(false),
     strokeStyle: z.enum(["solid", "dashed"]).default("solid"),
   })
-  .superRefine((data, ctx) => {
-    const hasFixedSize = data.width !== undefined && data.height !== undefined
-    const hasOverlay = Array.isArray(data.overlay) && data.overlay.length > 0
-
-    if (!hasFixedSize && !hasOverlay) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Must provide either both `width` and `height`, or a non-empty `overlay` array.",
-      })
-    }
-
-    if (hasFixedSize && hasOverlay) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Cannot provide both `overlay` and (`width` and `height`) — choose one mode.",
-      })
-    }
-  })
-
+  .refine(
+    (elm) =>
+      (elm.width !== undefined && elm.height !== undefined) ||
+      (Array.isArray(elm.overlay) && elm.overlay.length > 0),
+    {
+      message:
+        "Must provide either both `width` and `height`, or a non-empty `overlay` array.",
+      path: [],
+    },
+  )
 export type SchematicBoxProps = z.input<typeof schematicBoxProps>
