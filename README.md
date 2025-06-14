@@ -390,6 +390,11 @@ export interface BaseGroupProps extends CommonLayoutProps, LayoutConfig {
   schLayout?: LayoutConfig
   cellBorder?: Border | null
   border?: Border | null
+  schPadding?: Distance
+  schPaddingLeft?: Distance
+  schPaddingRight?: Distance
+  schPaddingTop?: Distance
+  schPaddingBottom?: Distance
 }
 ```
 
