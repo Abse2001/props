@@ -5,6 +5,10 @@ import {
   commonComponentProps,
   lrPolarPins,
 } from "lib/common/layout"
+import {
+  schematicOrientation,
+  type SchematicOrientation,
+} from "lib/common/schematicOrientation"
 import { expectTypesMatch } from "lib/typecheck"
 import type { Connections } from "lib/utility-types/connections-and-selectors"
 import { z } from "zod"
@@ -19,7 +23,8 @@ export const capacitorPinLabels = [
 ] as const
 export type CapacitorPinLabels = (typeof capacitorPinLabels)[number]
 
-export interface CapacitorProps extends CommonComponentProps {
+export interface CapacitorProps<PinLabel extends string = string>
+  extends CommonComponentProps<PinLabel> {
   capacitance: number | string
   maxVoltageRating?: number | string
   schShowRatings?: boolean
@@ -29,6 +34,7 @@ export interface CapacitorProps extends CommonComponentProps {
   bypassFor?: string
   bypassTo?: string
   maxDecouplingTraceLength?: number
+  schOrientation?: SchematicOrientation
   connections?: Connections<CapacitorPinLabels>
 }
 
@@ -42,6 +48,7 @@ export const capacitorProps = commonComponentProps.extend({
   bypassFor: z.string().optional(),
   bypassTo: z.string().optional(),
   maxDecouplingTraceLength: z.number().optional(),
+  schOrientation: schematicOrientation.optional(),
   connections: createConnectionsProp(capacitorPinLabels).optional(),
 })
 export const capacitorPins = lrPolarPins

@@ -3,6 +3,10 @@ import {
   type CommonComponentProps,
   commonComponentProps,
 } from "lib/common/layout"
+import {
+  schematicOrientation,
+  type SchematicOrientation,
+} from "lib/common/schematicOrientation"
 import type { Connections } from "lib/utility-types/connections-and-selectors"
 
 /**
@@ -12,7 +16,8 @@ export const fusePinLabels = ["pin1", "pin2"] as const
 
 export type FusePinLabels = (typeof fusePinLabels)[number]
 
-export interface FuseProps extends CommonComponentProps {
+export interface FuseProps<PinLabel extends string = string>
+  extends CommonComponentProps<PinLabel> {
   /**
    * Current rating of the fuse in amperes
    */
@@ -28,10 +33,12 @@ export interface FuseProps extends CommonComponentProps {
    */
   schShowRatings?: boolean
 
+  schOrientation?: SchematicOrientation
+
   /**
    * Connections to other components
    */
-  connections?: Connections<FusePinLabels>
+  connections?: Connections<PinLabel>
 }
 
 /**
@@ -41,6 +48,7 @@ export const fuseProps = commonComponentProps.extend({
   currentRating: z.union([z.number(), z.string()]),
   voltageRating: z.union([z.number(), z.string()]).optional(),
   schShowRatings: z.boolean().optional(),
+  schOrientation: schematicOrientation.optional(),
   connections: z
     .record(
       z.string(),

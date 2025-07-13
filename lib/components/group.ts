@@ -1,4 +1,3 @@
-import type { LayoutBuilder } from "@tscircuit/layout"
 import { layer_ref, length } from "circuit-json"
 import type { Distance } from "lib/common/distance"
 import {
@@ -35,6 +34,14 @@ export const layoutConfig = z.object({
   flexColumn: z.boolean().optional(),
   gap: z.number().or(z.string()).optional(),
 
+  padding: length.optional(),
+  paddingLeft: length.optional(),
+  paddingRight: length.optional(),
+  paddingTop: length.optional(),
+  paddingBottom: length.optional(),
+  paddingX: length.optional(),
+  paddingY: length.optional(),
+
   width: length.optional(),
   height: length.optional(),
 
@@ -62,6 +69,14 @@ export interface LayoutConfig {
   flexColumn?: boolean
   gap?: number | string
 
+  padding?: Distance
+  paddingLeft?: Distance
+  paddingRight?: Distance
+  paddingTop?: Distance
+  paddingBottom?: Distance
+  paddingX?: Distance
+  paddingY?: Distance
+
   width?: Distance
   height?: Distance
 
@@ -87,6 +102,11 @@ export interface BaseGroupProps extends CommonLayoutProps, LayoutConfig {
   name?: string
   key?: any
   children?: any
+
+  /**
+   * Title to display above this group in the schematic view
+   */
+  schTitle?: string
 
   pcbWidth?: Distance
   pcbHeight?: Distance
@@ -122,9 +142,16 @@ export interface AutorouterConfig {
   serverMode?: "job" | "solve-endpoint"
   serverCacheEnabled?: boolean
   cache?: PcbRouteCache
+  traceClearance?: Distance
   groupMode?: "sequential-trace" | "subcircuit"
   local?: boolean
   algorithmFn?: (simpleRouteJson: any) => Promise<any>
+  preset?:
+    | "sequential-trace"
+    | "subcircuit"
+    | "auto"
+    | "auto-local"
+    | "auto-cloud"
 }
 
 export type AutorouterProp =
@@ -141,11 +168,21 @@ export const autorouterConfig = z.object({
   serverMode: z.enum(["job", "solve-endpoint"]).optional(),
   serverCacheEnabled: z.boolean().optional(),
   cache: z.custom<PcbRouteCache>((v) => true).optional(),
+  traceClearance: length.optional(),
   groupMode: z.enum(["sequential-trace", "subcircuit"]).optional(),
   algorithmFn: z
     .custom<(simpleRouteJson: any) => Promise<any>>(
       (v) => typeof v === "function" || v === undefined,
     )
+    .optional(),
+  preset: z
+    .enum([
+      "sequential-trace",
+      "subcircuit",
+      "auto",
+      "auto-local",
+      "auto-cloud",
+    ])
     .optional(),
   local: z.boolean().optional(),
 })
@@ -160,7 +197,6 @@ export const autorouterProp = z.union([
 ])
 
 export interface SubcircuitGroupProps extends BaseGroupProps {
-  layout?: LayoutBuilder
   manualEdits?: ManualEditsFileInput
   routingDisabled?: boolean
   defaultTraceWidth?: Distance
@@ -197,6 +233,7 @@ export type GroupProps = SubcircuitGroupPropsWithBool | NonSubcircuitGroupProps
 export const baseGroupProps = commonLayoutProps.extend({
   name: z.string().optional(),
   children: z.any().optional(),
+  schTitle: z.string().optional(),
   key: z.any().optional(),
 
   ...layoutConfig.shape,
@@ -218,7 +255,6 @@ export const baseGroupProps = commonLayoutProps.extend({
 export const partsEngine = z.custom<PartsEngine>((v) => "findPart" in v)
 
 export const subcircuitGroupProps = baseGroupProps.extend({
-  layout: z.custom<LayoutBuilder>((v) => true).optional(),
   manualEdits: manual_edits_file.optional(),
   schAutoLayoutEnabled: z.boolean().optional(),
   schTraceAutoLabelEnabled: z.boolean().optional(),

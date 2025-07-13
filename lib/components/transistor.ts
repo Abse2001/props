@@ -5,12 +5,13 @@ import {
 import { expectTypesMatch } from "lib/typecheck"
 import { z } from "zod"
 
-export interface TransistorProps extends CommonComponentProps {
-  type: "npn" | "pnp" | "bjt" | "jfet" | "mosfet"
+export interface TransistorProps<PinLabel extends string = string>
+  extends CommonComponentProps<PinLabel> {
+  type: "npn" | "pnp" | "bjt" | "jfet" | "mosfet" | "igbt"
 }
 
 export const transistorProps = commonComponentProps.extend({
-  type: z.enum(["npn", "pnp", "bjt", "jfet", "mosfet"]),
+  type: z.enum(["npn", "pnp", "bjt", "jfet", "mosfet", "igbt"]),
 })
 
 export const transistorPins = [
@@ -21,6 +22,7 @@ export const transistorPins = [
   "pin3",
   "base",
 ] as const
+export type TransistorPinLabels = (typeof transistorPins)[number]
 
 type InferredTransistorProps = z.input<typeof transistorProps>
 expectTypesMatch<TransistorProps, InferredTransistorProps>(true)

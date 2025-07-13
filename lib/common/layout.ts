@@ -8,7 +8,7 @@ import {
 import { expectTypesMatch } from "lib/typecheck"
 import { z } from "zod"
 import { type CadModelProp, cadModelProp } from "./cadModel"
-import { type Footprint, footprintProp } from "./footprintProp"
+import { type FootprintProp, footprintProp } from "./footprintProp"
 
 export interface PcbLayoutProps {
   pcbX?: string | number
@@ -27,7 +27,7 @@ export interface CommonLayoutProps {
   schRotation?: string | number
 
   layer?: LayerRefInput
-  footprint?: Footprint
+  footprint?: FootprintProp
 }
 
 export const pcbLayoutProps = z.object({
@@ -70,9 +70,11 @@ export const supplierProps = z.object({
 
 expectTypesMatch<SupplierProps, z.input<typeof supplierProps>>(true)
 
-export interface CommonComponentProps extends CommonLayoutProps {
+export interface CommonComponentProps<PinLabel extends string = string>
+  extends CommonLayoutProps {
   key?: any
   name: string
+  pinAttributes?: Record<PinLabel, Record<string, any>>
   supplierPartNumbers?: SupplierPartNumbers
   cadModel?: CadModelProp
   children?: any
@@ -89,6 +91,9 @@ export const commonComponentProps = commonLayoutProps
     children: z.any().optional(),
     symbolName: z.string().optional(),
     doNotPlace: z.boolean().optional(),
+    pinAttributes: z
+      .record(z.string(), z.record(z.string(), z.any()))
+      .optional(),
   })
 
 type InferredCommonComponentProps = z.input<typeof commonComponentProps>

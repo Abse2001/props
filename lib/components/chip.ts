@@ -33,13 +33,17 @@ export interface PinCompatibleVariant {
 }
 
 export interface ChipPropsSU<PinLabel extends string = string>
-  extends CommonComponentProps {
+  extends CommonComponentProps<PinLabel> {
   manufacturerPartNumber?: string
   pinLabels?: PinLabelsProp<string, PinLabel>
   /**
    * Whether to show pin aliases in the schematic
    */
   showPinAliases?: boolean
+  /**
+   * Labels for PCB pins
+   */
+  pcbPinLabels?: Record<string, string>
   schPinArrangement?: SchematicPortArrangement
   /** @deprecated Use schPinArrangement instead. */
   schPortArrangement?: SchematicPortArrangement
@@ -57,7 +61,7 @@ export interface ChipPropsSU<PinLabel extends string = string>
 export type ChipProps<PinLabelMap extends PinLabelsProp | string = string> =
   ChipPropsSU<
     PinLabelMap extends PinLabelsProp
-      ? PinLabelFromPinLabelMap<PinLabelMap>
+      ? PinLabelFromPinLabelMap<PinLabelMap> | keyof PinLabelMap
       : PinLabelMap
   >
 
@@ -126,6 +130,7 @@ export const chipProps = commonComponentProps.extend({
   manufacturerPartNumber: z.string().optional(),
   pinLabels: pinLabelsProp.optional(),
   showPinAliases: z.boolean().optional(),
+  pcbPinLabels: z.record(z.string(), z.string()).optional(),
   internallyConnectedPins: z.array(z.array(z.string())).optional(),
   externallyConnectedPins: z.array(z.array(z.string())).optional(),
   schPinArrangement: schematicPinArrangement.optional(),

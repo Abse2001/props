@@ -5,6 +5,10 @@ import {
   lrPolarPins,
   type CommonComponentProps,
 } from "lib/common/layout"
+import {
+  schematicOrientation,
+  type SchematicOrientation,
+} from "lib/common/schematicOrientation"
 import { expectTypesMatch } from "lib/typecheck"
 
 /** @deprecated use battery_capacity from circuit-json when circuit-json is updated */
@@ -24,13 +28,17 @@ const capacity = z
   })
   .describe("Battery capacity in mAh")
 
-export interface BatteryProps extends CommonComponentProps {
+export interface BatteryProps<PinLabel extends string = string>
+  extends CommonComponentProps<PinLabel> {
   capacity?: number | string
+  schOrientation?: SchematicOrientation
 }
 
 export const batteryProps = commonComponentProps.extend({
   capacity: capacity.optional(),
+  schOrientation: schematicOrientation.optional(),
 })
 export const batteryPins = lrPolarPins
+export type BatteryPinLabels = (typeof batteryPins)[number]
 
 expectTypesMatch<BatteryProps, z.input<typeof batteryProps>>(true)
